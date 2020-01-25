@@ -1,0 +1,61 @@
+- name: install kubelet
+  apt:
+    name: kubelet
+    state: present
+    update_cache: true
+    
+- name: initialize the cluster
+  command: kubeadm init --pod-network-cidr=10.244.0.0/16
+  args:
+    creates: /var/log/cluster.log
+  register: kubeadm_init_raw
+
+- name: save kubeadm init output to a file
+  copy:
+    content: "stdout:\n{{ kubeadm_init_raw.stdout }}\n\nstderr:\n{{ kubeadm_init_raw.stderr }}"
+    dest: /var/log/cluster.log
+  when: kubeadm_init_raw.changed
+
+- name: create .kube directory
+  file:
+    path: "/home/{{ ansible_user }}/.kube"
+    state: directory
+    mode: 0755
+    owner: "{{ ansible_user }}"
+    group: root
+
+- name: copy admin.conf to user's kube config
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: "/home/{{ ansible_user }}/.kube/config"
+    remote_src: yes
+    owner: "{{ ansible_user }}"
+    group: root
+    
+- name: download helm
+  unarchive: 
+    src: "{{ helm_url }}"
+    dest: /tmp
+    remote_src: yes
+  tags: download
+
+- name: create the installation directory
+  file:
+    path: "{{ helm_bin_dir }}"
+    state: directory
+
+- name: copy helm binary
+  copy:
+    src: /tmp/linux-arm/helm
+    dest: "{{ helm_bin_dir }}"
+    mode: 0755
+    remote_src: yes
+
+- name: create helm soft link
+  file:
+    src: "{{ helm_bin_dir }}/helm"
+    dest: "/usr/bin/helm"
+    state: link
+
+- include_tasks: tiller.yml
+#- include_tasks: rbac.yml

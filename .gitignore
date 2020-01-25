@@ -1,0 +1,8 @@
+ansible/hosts
+ansible/group_vars/*.yml
+os/*.yml
+os/*dns.sh
+front/tls/*
+!front/tls/.gitkeep
+front/*.yaml
+docker/Dockerfile.*

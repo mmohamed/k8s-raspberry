@@ -1,0 +1,2 @@
+- name: install or upgrade tiller
+  shell: "{{ helm_bin_dir }}/helm init"

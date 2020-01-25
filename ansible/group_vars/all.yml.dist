@@ -1,0 +1,3 @@
+ansible_user: {{user}}
+ansible_ssh_pass: {{password}}
+ansible_connection: paramiko
