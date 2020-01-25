@@ -33,7 +33,12 @@ kubectl apply -f storage/nfs-deployment.yml
 kubectl apply -f storage/nfs-testing.yml
 ```
 
-#### 4- Cluster Tear down :
+#### 4- Save your Cluster :
+```
+./os/backup.sh # cluset data will be saved in ~/bkp
+```
+
+#### 5- Cluster Tear down :
 ```
 kubeadm reset
 ```

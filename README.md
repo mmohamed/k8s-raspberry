@@ -23,10 +23,11 @@ flash --hostname south hypriotos-rpi-v1.12.0.img
 
 #### [4-Ansible for deployment](ansible/README.md)
 
+
 #### [5-Set up cluster](kube/README.md)
 
 
-#### 6-Get SSL for your domains (letsencrypt)[https://letsencrypt.org]
+#### 6-Get SSL for your domains [letsencrypt](https://letsencrypt.org)
 
 
 #### 7-Cluster Dashboard [See](https://blog.hypriot.com/post/setup-kubernetes-raspberry-pi-cluster/)
@@ -45,3 +46,4 @@ KEY=$(cat front/tls/key | base64)
 sed  "s/{{crt}}/`echo $CRT`/" front/front-deployment.yaml.dist | sed "s/{{key}}/`echo $KEY`/" | sed "s/{{host}}/[YOUR-HOSTNAME]/" | sed "s/{{name}}/[YOUR-APPNAME]/" | sed "s/{{image}}/[YOUR-IMGPATH]/" > front/deployment.yaml
 kubectl apply -f front/deployment.yaml
 ```
+
