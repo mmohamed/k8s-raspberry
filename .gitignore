@@ -6,3 +6,4 @@ front/tls/*
 !front/tls/.gitkeep
 front/*.yaml
 docker/Dockerfile.*
+job/*-dyndns.yaml

@@ -1,0 +1,28 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: dynamicdns
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: dnsutils
+            image: docker.io/medinvention/dynamicdns:arm
+            env:
+            - name: USERNAME
+              value: "{{USERNAME}}"
+            - name: PASSWORD
+              value: "{{PASSWORD}}"
+            - name: HOSTNAME
+              value: "{{HOSTNAME}}"
+            command:
+              - "/bin/sh"
+            args:  
+              - "/updater.sh"
+          restartPolicy: OnFailure
+
+# pods=$(kubectl get pods --selector=job-name=dynamicdns --output=jsonpath={.items[*].metadata.name})
+# kubectl logs $pods
