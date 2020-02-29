@@ -7,3 +7,5 @@ front/tls/*
 front/*.yaml
 docker/Dockerfile.*
 job/*-dyndns.yaml
+default-backend/*.yaml
+s2i/**/*.groovy

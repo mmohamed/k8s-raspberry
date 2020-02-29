@@ -1,0 +1,76 @@
+pipeline {
+   agent {
+       label  'south'
+   }
+
+   tools {
+      maven "AutoMaven"
+   }
+
+   stages {
+      stage('Build') {
+         steps {
+            //checkout
+            git branch: 'k8s', url: 'https://github.com/mmohamed/spring-batch.git'
+            // Package 
+            sh 'mvn -Dmaven.test.skip=true clean package'
+            // Copy artifact to Docker build workspace
+            sh 'mkdir -p ./target/dependency && (cd target/dependency; jar -xf ../*.jar) && cd ../..'     
+         }
+      }
+
+
+      stage('Prepare Workspace'){
+         steps{
+            // Prepare Docker workspace
+            withCredentials([sshUserPrivateKey(credentialsId: "SSHBUILDERNODE", keyFileVariable: 'keyfile')]) {
+                sh "ssh -o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${keyfile} [USER]@[BUILDER-NODE-IP] 'mkdir -p ~/s2i-k8S/$BUILD_NUMBER'"
+                sh "scp -o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${keyfile} -r target [USER]@[BUILDER-NODE-IP]:/home/pirate/s2i-k8S/$BUILD_NUMBER"
+                sh "scp -o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${keyfile} -r csv [USER]@[BUILDER-NODE-IP]:/home/pirate/s2i-k8S/$BUILD_NUMBER"
+            }
+            // Create Dockerfile
+            writeFile file: "./Dockerfile", text: '''
+FROM arm32v7/openjdk:8-jdk 
+ARG user=spring
+ARG group=spring
+ARG uid=1000
+ARG gid=1000
+RUN groupadd -g ${gid} ${group} && useradd -u ${uid} -g ${gid} -m -s /bin/bash ${user}
+USER ${user}
+ARG DEPENDENCY=target/dependency
+COPY ${DEPENDENCY}/BOOT-INF/lib /app/lib
+COPY ${DEPENDENCY}/META-INF /app/META-INF
+COPY ${DEPENDENCY}/BOOT-INF/classes /app
+COPY csv /app/csv
+ENTRYPOINT ["java","-cp","app:app/lib/*","com.capgemini.main.Application"]'''
+            // copy docker file
+            withCredentials([sshUserPrivateKey(credentialsId: "SSHBUILDERNODE", keyFileVariable: 'keyfile')]) {
+                sh "scp -o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${keyfile} Dockerfile [USER]@[BUILDER-NODE-IP]:/home/pirate/s2i-k8S/$BUILD_NUMBER"
+            }
+         }
+      }
+
+      stage('Docker build'){
+         steps{
+            withCredentials([sshUserPrivateKey(credentialsId: "SSHBUILDERNODE", keyFileVariable: 'keyfile')]) {
+               sh "ssh -o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${keyfile} [USER]@[BUILDER-NODE-IP] 'docker build ~/s2i-k8S/$BUILD_NUMBER -t medinvention/spring-batch:arm'"
+               sh "ssh -o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${keyfile} [USER]@[BUILDER-NODE-IP] 'docker push medinvention/spring-batch:arm'"
+               sh "ssh -o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${keyfile} [USER]@[BUILDER-NODE-IP] 'docker rmi medinvention/spring-batch:arm'"
+            }
+         }
+      }
+
+      stage('Kubernetes deploy'){
+         steps{
+            // deploy
+            withCredentials([string(credentialsId: 'KubeToken', variable: 'TOKEN'),
+                  string(credentialsId: 'TLSKey', variable: 'KEY'),
+                  string(credentialsId: 'TLSCrt', variable: 'CRT')
+               ]) {
+               sh "export TOKEN=$TOKEN && export CRT=$CRT && export KEY=$KEY"
+               sh "cd k8s && sh deploy.sh"
+            }  
+         }
+      }
+   }
+}

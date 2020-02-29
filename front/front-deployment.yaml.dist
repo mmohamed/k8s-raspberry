@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: front-tls
+  name: {{name}}-tls
   namespace: front
 type: Opaque  
 data:
@@ -31,7 +31,7 @@ spec:
   tls:
     - hosts:
       - {{host}}
-      secretName: front-tls
+      secretName: {{name}}-tls
 
 ---
 apiVersion: apps/v1

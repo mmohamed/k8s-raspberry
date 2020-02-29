@@ -1,0 +1,27 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+  name: jenkins-access
+  namespace: jenkins
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: jenkins-access
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: jenkins-access
+    namespace: jenkins
+
+# Run this cmd to get token  
+# kubectl -n jenkins describe secret $(kubectl -n jenkins get secret | grep jenkins-access | awk '{print $1}')  
+# Or
+# kubectl -n jenkins get serviceaccount jenkins-access -o go-template --template='{{range .secrets}}{{.name}}{{"\n"}}{{end}}'
+# kubectl -n jenkins get secrets jenkins-access-token-**** -o go-template --template '{{index .data "token"}}' | base64 -d
