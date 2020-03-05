@@ -10,4 +10,4 @@ COPY --chown=spring:spring ${DEPENDENCY}/META-INF /var/app/META-INF
 COPY --chown=spring:spring ${DEPENDENCY}/BOOT-INF/classes /var/app
 COPY --chown=spring:spring csv /var/app/csv
 USER ${user}
-ENTRYPOINT ["java","-cp","var/app:var/app/lib/*","com.capgemini.main.Application"]
+ENTRYPOINT ["java","-cp","var/app:var/app/lib/*","dev.medinvention.main.Application"]
