@@ -54,7 +54,7 @@ spec:
     spec:
       containers:
       - name: front
-        image: k8s-monitoring-front:arm
+        image: medinvention/k8s-monitoring-front:arm
         imagePullPolicy: Always
         ports:
         - containerPort: 80
