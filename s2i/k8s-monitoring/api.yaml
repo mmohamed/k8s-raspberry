@@ -61,7 +61,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: medinvention/k8s-monitoring:arm
+          image: medinvention/k8s-monitoring-api:arm
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

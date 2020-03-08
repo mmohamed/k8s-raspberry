@@ -8,6 +8,5 @@ ARG DEPENDENCY=target/dependency
 COPY --chown=spring:spring ${DEPENDENCY}/BOOT-INF/lib /var/app/lib
 COPY --chown=spring:spring ${DEPENDENCY}/META-INF /var/app/META-INF
 COPY --chown=spring:spring ${DEPENDENCY}/BOOT-INF/classes /var/app
-COPY --chown=spring:spring csv /var/app/csv
 USER ${user}
 ENTRYPOINT ["java","-cp","var/app:var/app/lib/*","dev.medinvention.service.Application"]

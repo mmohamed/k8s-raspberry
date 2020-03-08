@@ -14,7 +14,7 @@ chmod +x flash
 sudo mv flash /usr/local/bin/flash
 ```
 
-#### 3-Flush Master & Nodes
+#### 3-Flush Master & Nodes (North -> Switch 4 / South -> Switch 3)
 ```
 flash --hostname master hypriotos-rpi-v1.12.0.img
 flash --hostname north hypriotos-rpi-v1.12.0.img
