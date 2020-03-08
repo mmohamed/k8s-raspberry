@@ -29,7 +29,7 @@ pipeline {
             sh 'cp -rn $NODEJS_HOME/lib/node_modules $NODEJS_HOME/node'
             sh 'ln -sfn $NODEJS_HOME/lib/node_modules/npm/bin/npm-cli.js $NODEJS_HOME/node/npm'
             sh 'ln -sfn $NODEJS_HOME/lib/node_modules/npm/bin/npx-cli.js $NODEJS_HOME/node/npx'
-            sh 'export NODE_OPTIONS="--max_old_space_size=256" && export REACT_APP_URL_BASE="https://apimonitoring.medinvention.dev" && export PATH=$PATH:$NODEJS_HOME/bin && export NODE_PATH=$NODEJS_HOME && mvn install'
+            sh 'export NODE_OPTIONS="--max_old_space_size=256" && export REACT_APP_URL_BASE="https://api-monitoring.medinvention.dev" && export PATH=$PATH:$NODEJS_HOME/bin && export NODE_PATH=$NODEJS_HOME && mvn install'
             // Copy artifact to Docker build workspace
             sh 'mkdir -p ./service/target/dependency && (cd service/target/dependency; jar -xf ../*.jar) && cd ../..'  
             sh 'mkdir -p ./service/target/_site && cp -r ./webapp/target/classes/static/* service/target/_site'   
