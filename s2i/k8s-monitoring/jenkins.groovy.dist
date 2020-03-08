@@ -29,7 +29,7 @@ pipeline {
             sh 'cp -rn $NODEJS_HOME/lib/node_modules $NODEJS_HOME/node'
             sh 'ln -sfn $NODEJS_HOME/lib/node_modules/npm/bin/npm-cli.js $NODEJS_HOME/node/npm'
             sh 'ln -sfn $NODEJS_HOME/lib/node_modules/npm/bin/npx-cli.js $NODEJS_HOME/node/npx'
-            sh 'export NODE_OPTIONS="--max_old_space_size=256" && export REACT_APP_URL_BASE="https://api-monitoring.medinvention.dev" && export PATH=$PATH:$NODEJS_HOME/bin && export NODE_PATH=$NODEJS_HOME && mvn install'
+            sh 'export NODE_OPTIONS="--max_old_space_size=256" && export REACT_APP_URL_BASE="https://api-monitoring.medinvention.dev/k8s" && export PATH=$PATH:$NODEJS_HOME/bin && export NODE_PATH=$NODEJS_HOME && mvn install'
             // Copy artifact to Docker build workspace
             sh 'mkdir -p ./service/target/dependency && (cd service/target/dependency; jar -xf ../*.jar) && cd ../..'  
             sh 'mkdir -p ./service/target/_site && cp -r ./webapp/target/classes/static/* service/target/_site'   
@@ -62,11 +62,26 @@ ENTRYPOINT ["java","-cp","var/app:var/app/lib/*","dev.medinvention.service.Appli
             writeFile file: "./Dockerfile.front", text: '''
 FROM nginx
 EXPOSE 80
-COPY target${TARGET}/_site/ /usr/share/nginx/html'''
+COPY target/_site/ /usr/share/nginx/html'''
+            // Create Dockerfile for front
+            writeFile file: "./nginx.conf", text: '''
+server {
+    listen       80;
+    server_name  localhost;
+    location / {
+        root   /usr/share/nginx/html;
+        try_files $uri /index.html;
+    }
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }    
+}'''
             // copy docker file
             withCredentials([sshUserPrivateKey(credentialsId: "SSHMaster", keyFileVariable: 'keyfile')]) {
                 sh "scp -o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${keyfile} Dockerfile.api [USER]@[NODEIP]:~/s2i-k8S/k8s-monitoring-$BUILD_NUMBER"
                 sh "scp -o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${keyfile} Dockerfile.front [USER]@[NODEIP]:~/s2i-k8S/k8s-monitoring-$BUILD_NUMBER"
+                sh "scp -o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${keyfile} nginx.conf [USER]@[NODEIP]:~/s2i-k8S/k8s-monitoring-$BUILD_NUMBER"
             }
          }
       }
