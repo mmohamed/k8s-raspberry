@@ -11,7 +11,7 @@ RUN apt-get -y install php
 
 RUN apt-get install -y php php-mysqlnd php-pgsql php-bcmath php-gd php-intl php-ldap \
     php-mbstring php-sqlite3 php-curl php-soap php-opcache php-xml php-memcached \
-    php-gmp libapache2-mod-php
+    php-gmp zip unzip php-zip libapache2-mod-php
 
 RUN php -v
 
