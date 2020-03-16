@@ -32,7 +32,7 @@ RUN sed -i 's/${APP_PATH}/\/opt\/app-root\/src/g' /etc/apache2/sites-enabled/000
     sed -i '170s%AllowOverride None%AllowOverride All%' /etc/apache2/apache2.conf && \
     sed -i 's/var\/www/opt\/app-root\/src\/public/' /etc/apache2/apache2.conf
 
-COPY public /opt/app-root/src/public
+ADD public /opt/app-root/src/
 
 RUN composer install --working-dir=/opt/app-root/src/public
 
