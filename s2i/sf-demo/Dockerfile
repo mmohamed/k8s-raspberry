@@ -10,7 +10,7 @@ RUN apt-get -y update && apt-get -y upgrade
 RUN apt-get -y install php
 
 RUN apt-get install -y php php-mysqlnd php-pgsql php-bcmath php-gd php-intl php-ldap \
-    php-mbstring php-curl php-soap php-opcache php-xml php-memcached \
+    php-mbstring php-sqlite3 php-curl php-soap php-opcache php-xml php-memcached \
     php-gmp libapache2-mod-php
 
 RUN php -v
