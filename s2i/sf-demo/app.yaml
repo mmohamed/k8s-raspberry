@@ -65,7 +65,7 @@ spec:
           imagePullPolicy: Always
           env:
             - name: APP_ENV
-              value: prod 
+              value: "prod"
             - name: DATABASE_USER
               valueFrom:
                 secretKeyRef:
@@ -79,11 +79,11 @@ spec:
             - name: DATABASE_HOST
               value: mysql.sfdemo.svc.cluster.local
             - name: DATABASE_PORT
-              value: 3306
+              value: "3306"
             - name: DATABASE_NAME
-              value: demodb
+              value: demo
             - name: MEMCACHED_URI
-              value: memcached://memcached.sfdemo.svc.cluster.local:11211
+              value: "memcached://memcached.sfdemo.svc.cluster.local:11211"
           ports:
             - containerPort: 8080
 

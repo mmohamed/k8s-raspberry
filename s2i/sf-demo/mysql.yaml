@@ -40,7 +40,7 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 250Mi
+      storage: 500Mi
   
 ---
 apiVersion: apps/v1
@@ -68,8 +68,8 @@ spec:
               memory: 64Mi
               cpu: 250m
             limits:
-              memory: 64Mi
-              cpu: 250m
+              memory: 128Mi
+              cpu: 500m
           env:
             - name: MYSQL_DATABASE
               value: demo
