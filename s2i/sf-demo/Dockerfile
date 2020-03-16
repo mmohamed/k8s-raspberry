@@ -34,6 +34,8 @@ RUN sed -i 's/${APP_PATH}/\/opt\/app-root\/src/g' /etc/apache2/sites-enabled/000
 
 COPY public /opt/app-root/src/public
 
+RUN composer install --working-dir=/opt/app-root/src/public
+
 RUN service apache2 stop && \
    useradd -u 1001 -r -g 0 -d ${HOME} -s /sbin/nologin \
    -c "Default Application User" default && \
