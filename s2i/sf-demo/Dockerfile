@@ -34,11 +34,11 @@ RUN sed -i 's/${APP_PATH}/\/opt\/app-root\/src/g' /etc/apache2/sites-enabled/000
 
 ADD public /opt/app-root/src/
 
-RUN composer install --working-dir=/opt/app-root/src/public
+RUN composer install --working-dir=/opt/app-root/src
 
 RUN service apache2 stop && \
    useradd -u 1001 -r -g 0 -d ${HOME} -s /sbin/nologin \
    -c "Default Application User" default && \
-   chown -R default:root /var/log/apache2 /opt/app-root/src/public
+   chown -R default:root /var/log/apache2 /opt/app-root/src
 
 CMD apachectl -d /etc/apache2 -f apache2.conf -e info -DFOREGROUND
