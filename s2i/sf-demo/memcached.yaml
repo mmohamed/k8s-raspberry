@@ -35,7 +35,7 @@ spec:
         app: memcached
     spec:
       containers:
-        - image: memcached/memcached:1.5.2
+        - image: memcached:1.5.2
           name: memcached
           resources:
             requests:

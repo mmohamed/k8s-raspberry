@@ -3,7 +3,7 @@ FROM ubuntu
 EXPOSE 8080
 
 ENV DEBIAN_FRONTEND=noninteractive \
-    COMPOSER_HASH=48e3236262b34d30969dca3c37281b3b4bbe3221bda826ac6a9a62d6444cdb0dcd0615698a5cbe587c3f0fe57a54d8f5
+    COMPOSER_HASH=e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a
 
 RUN apt-get -y update && apt-get -y upgrade
 
