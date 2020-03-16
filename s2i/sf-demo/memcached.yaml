@@ -1,0 +1,49 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+   name: sfdemo
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: memcached
+  namespace: sfdemo
+spec:
+  ports:
+  - port: 11211
+  selector:
+    app: memcached
+  clusterIP: None
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memcached
+  namespace: sfdemo
+spec:
+  selector:
+    matchLabels:
+      app: memcached
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: memcached
+    spec:
+      containers:
+        - image: memcached/memcached:1.5.2
+          name: memcached
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 250m
+            limits:
+              memory: 64Mi
+              cpu: 250m
+          ports:
+            - containerPort: 11211
+              name: memcached

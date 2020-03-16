@@ -1,0 +1,102 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+   name: sfdemo
+
+---   
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sfdemo-tls
+  namespace: sfdemo
+type: Opaque  
+data:
+  tls.crt: {{crt}}
+  tls.key: {{key}}
+type: kubernetes.io/tls
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  name: sfdemo-ingress
+  namespace: sfdemo
+  labels:
+    app: app
+spec:
+  rules:
+    - host: {{host}}
+      http:
+        paths:
+          - backend:
+              serviceName: sfdemo-service
+              servicePort: http
+            path: /
+  tls:
+    - hosts:
+      - {{host}}
+      secretName: sfdemo-tls
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+  namespace: sfdemo
+  labels:
+    app: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+        commit: '{{commit}}'
+    spec:
+      containers:
+        - name: app
+          image: medinvention/sfdemo:arm
+          imagePullPolicy: Always
+          env:
+            - name: APP_ENV
+              value: prod 
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysqlsecret
+                  key: username
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysqlsecret
+                  key: password
+            - name: DATABASE_HOST
+              value: mysql.sfdemo.svc.cluster.local
+            - name: DATABASE_PORT
+              value: 3306
+            - name: DATABASE_NAME
+              value: demodb
+            - name: MEMCACHED_URI
+              value: memcached://memcached.sfdemo.svc.cluster.local:11211
+          ports:
+            - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sfdemo-service
+  namespace: sfdemo
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  selector:
+    app: app
