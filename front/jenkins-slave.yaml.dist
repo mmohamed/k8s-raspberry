@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: jenkins
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: jenkins-slave-pvc
+  namespace: jenkins
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+      
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-slave
+  namespace: jenkins
+  labels:
+    app: jenkins-slave
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins-slave
+  template:
+    metadata:
+      labels:
+        app: jenkins-slave
+    spec:
+      containers:
+      - name: jenkins-master
+        image: medinvention/jenkins-slave:arm
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"
+        env:
+          - name: "JENKINS_SECRET"
+            value: "{{jenkins-secret}}"
+          - name: "JENKINS_AGENT_NAME"
+            value: "south"
+          - name: "JENKINS_DIRECT_CONNECTION"
+            value: "jenkins-slave-service.front.svc.cluster.local:50000"
+          - name: "JENKINS_INSTANCE_IDENTITY"
+            value: "{{jenkins-id}}"
+        volumeMounts:
+        - mountPath: /var/jenkins
+          name: jenkins-home
+      volumes:
+        - name: jenkins-home
+          persistentVolumeClaim:
+            claimName: jenkins-slave-pvc
+      nodeSelector:
+        name: south

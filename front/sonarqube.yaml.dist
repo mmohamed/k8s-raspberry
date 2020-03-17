@@ -1,0 +1,157 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sonar
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sonarqube-tls
+  namespace: sonar
+data:
+  tls.key: {{key}}
+  tls.crt: {{crt}}
+type: kubernetes.io/tls
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: sonarqube-data-pvc
+  namespace: sonar
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 512Mi
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: sonarqube-logs-pvc
+  namespace: sonar
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 64Mi
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: sonarqube-extensions-pvc
+  namespace: sonar
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 128Mi
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  name: sonarqube
+  namespace: sonar
+  labels:
+    app: sonarqube
+spec:
+  rules:
+    - host: {{host}} 
+      http:
+        paths:
+          - backend:
+              serviceName: sonarqube-service
+              servicePort: http
+            path: /
+  tls:
+    - hosts:
+      - {{host}}
+      secretName: sonarqube-tls
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sonar-config
+  namespace: sonar
+data:
+  sonar.properties: |
+    sonar.search.javaOpts=-Xms750m -Xmx750m
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sonarqube
+  namespace: sonar
+  labels:
+    app: sonarqube
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sonarqube
+  template:
+    metadata:
+      labels:
+        app: sonarqube
+    spec:
+      containers:
+      - name: sonarqube
+        image: medinvention/sonarqube:arm
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "0"
+            cpu: "0"
+          limits:
+            memory: "750Mi"
+            cpu: "250m"
+        ports:
+        - containerPort: 9000
+        volumeMounts:
+        - mountPath: /opt/sonarqube/conf
+          name: sonarqube-conf  
+        - mountPath: /opt/sonarqube/data
+          name: sonarqube-data
+        - mountPath: /opt/sonarqube/logs
+          name: sonarqube-logs
+        - mountPath: /opt/sonarqube/extensions
+          name: sonarqube-extensions
+      volumes:
+        - name: sonarqube-conf
+          configMap:
+            name: sonar-config
+        - name: sonarqube-data
+          persistentVolumeClaim:
+            claimName: sonarqube-data-pvc
+        - name: sonarqube-logs
+          persistentVolumeClaim:
+            claimName: sonarqube-logs-pvc
+        - name: sonarqube-extensions
+          persistentVolumeClaim:
+            claimName: sonarqube-extensions-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sonarqube-service
+  namespace: sonar
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 9000
+  selector:
+    app: sonarqube
