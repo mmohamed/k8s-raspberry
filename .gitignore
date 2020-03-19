@@ -2,9 +2,9 @@ ansible/hosts
 ansible/group_vars/*.yml
 os/*.yml
 os/*dns.sh
-front/tls/*
-!front/tls/.gitkeep
-front/*.yaml
+deployment/tls/*
+!deployment/tls/.gitkeep
+deployment/*.yaml
 docker/Dockerfile.*
 job/*-dyndns.yaml
 default-backend/*.yaml
