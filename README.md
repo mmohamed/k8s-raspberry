@@ -3,7 +3,7 @@ Kubernetes On Raspberry
 
 #### 1-Get Hypriotos image [See](https://github.com/hypriot/image-builder-rpi/releases)
 ```
-curl -Ss https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.0/hypriotos-rpi-v1.12.0.img.zip
+curl -OJSLs https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.0/hypriotos-rpi-v1.12.0.img.zip
 unzip hypriotos-rpi-v1.12.0.img.zip
 ```
 
@@ -32,8 +32,8 @@ flash --hostname south hypriotos-rpi-v1.12.0.img
 
 #### 7-Cluster Dashboard [See](https://blog.hypriot.com/post/setup-kubernetes-raspberry-pi-cluster/)
 ```
-CRT=$(cat front/tls/cert | base64)
-KEY=$(cat front/tls/key | base64)
+CRT=$(cat front/tls/cert.raw | base64)
+KEY=$(cat front/tls/key.raw | base64)
 sed  "s/{{crt}}/`echo $CRT`/" front/dashboard-deployment.yaml.dist | sed "s/{{key}}/`echo $KEY`/" | sed "s/{{host}}/[YOUR-HOSTNAME]/" > front/dashboard.yaml
 kubectl apply -f front/dashboard.yaml
 kubectl -n kube-system describe secret `kubectl -n kube-system get secret | grep replicaset-controller-token | awk '{print $1}'` | grep token: | awk '{print $2}'

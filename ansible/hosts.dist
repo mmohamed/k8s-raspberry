@@ -4,6 +4,8 @@ master ansible_host={{masterip}}
 [nodes]
 north ansible_host={{northip}}
 south ansible_host={{southip}}
+east ansible_host={{eastip}}
+west ansible_host={{westip}}
 
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3
