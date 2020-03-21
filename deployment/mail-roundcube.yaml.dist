@@ -1,0 +1,115 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mail
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mail-tls
+  namespace: mail
+data:
+  tls.key: {{key}}
+  tls.crt: {{crt}}
+type: kubernetes.io/tls
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: 6m
+  name: mail
+  namespace: mail
+  labels:
+    app: roundcube
+spec:
+  rules:
+    - host: {{host}}
+      http:
+        paths:
+          - backend:
+              serviceName: mail-service
+              servicePort: http
+            path: /
+  tls:
+    - hosts:
+      - {{host}}
+      secretName: mail-tls
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: roundcube
+  namespace: mail
+  labels:
+    app: roundcube
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: roundcube
+  template:
+    metadata:
+      labels:
+        app: roundcube
+    spec:
+      containers:
+      - name: roundcube
+        image: medinvention/roundcube:arm
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "0"
+            cpu: "0"
+          limits:
+            memory: "192Mi"
+            cpu: "250m"
+        env:
+          - name: ROUNDCUBEMAIL_DEFAULT_HOST
+            value: imap.gmail.com
+          - name: ROUNDCUBEMAIL_DEFAULT_PORT
+            value: 993
+          - name: ROUNDCUBEMAIL_SMTP_SERVER
+            value: tls://smtp.gmail.com
+          - name: ROUNDCUBEMAIL_SMTP_PORT
+            value: 587
+          - name: ROUNDCUBEMAIL_UPLOAD_MAX_FILESIZE
+            value: 5M
+          - name: ROUNDCUBEMAIL_DB_TYPE
+            value: mysql
+          - name: ROUNDCUBEMAIL_DB_HOST
+            value: mysql.blog.svc.cluster.local
+          - name: ROUNDCUBEMAIL_DB_PORT
+            value: 3306
+          - name: ROUNDCUBEMAIL_DB_USER 
+            valueFrom:
+                secretKeyRef:
+                  name: mysqlsecret
+                  key: username
+          - name: ROUNDCUBEMAIL_DB_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                  name: mysqlsecret
+                  key: password
+          - name: ROUNDCUBEMAIL_DB_NAME
+            value: roundcube
+        ports:
+        - containerPort: 9000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mail-service
+  namespace: mail
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 9000
+  selector:
+    app: roundcube

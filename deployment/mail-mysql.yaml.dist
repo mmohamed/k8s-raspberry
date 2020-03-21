@@ -1,0 +1,100 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+   name: mail
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysqlsecret
+  namespace: mail
+type: Opaque
+data:
+  rootpassword: cm9vdA==
+  username: cm91bmRjdWJlCg==
+  password: cm91bmRjdWJlCg==
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: mail
+spec:
+  ports:
+  - port: 3306
+  selector:
+    app: mysql
+  clusterIP: None
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+  namespace: mail
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Mi
+  
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: mail
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - image: medinvention/mysql:arm
+          imagePullPolicy: IfNotPresent
+          name: mysql
+          resources:
+            requests:
+              memory: "0"
+              cpu: "0"
+            limits:
+              memory: 64Mi
+              cpu: 500m
+          env:
+            - name: MYSQL_DATABASE
+              value: roundcube
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysqlsecret
+                  key: username
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysqlsecret
+                  key: password
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysqlsecret
+                  key: rootpassword
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: mysql-pv-claim
