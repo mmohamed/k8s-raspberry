@@ -9,10 +9,11 @@
         regexp: '(rootwait)$'
         replace: '\1 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory'
 
-    - name: Disable all swap
-      command: dphys-swapfile swapoff && \
-               dphys-swapfile uninstall && \
-               update-rc.d dphys-swapfile remove
+# For Hypriost OS is also disabled (activate it for other OS)
+#    - name: Disable all swap
+#      command: dphys-swapfile swapoff && \
+#               dphys-swapfile uninstall && \
+#               update-rc.d dphys-swapfile remove
 
     - name: Reboot unit to apply memory control group subsystem fix
       reboot:

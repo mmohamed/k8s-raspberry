@@ -1,15 +1,14 @@
-Setup cluster
-=======================
+# Setup cluster
 
-#### 1-Install Flannel for CNI 
+##### 1-Install Flannel for CNI 
 ```
-kubectl create -f kube/flannel.yml
-kubectl create -f kube/kubedns.yml
+kubectl create -f flannel.yml
+kubectl create -f kubedns.yml
 # Must be done on all node
 sudo sysctl net.bridge.bridge-nf-call-iptables=1
 ```
 
-#### 2-Install Nginx Ingress
+##### 2-Install Nginx Ingress
 ```
 helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 helm install nginx-ingress stable/nginx-ingress --set defaultBackend.image.repository=docker.io/medinvention/ingress-default-backend,controller.image.repository=quay.io/kubernetes-ingress-controller/nginx-ingress-controller-arm,defaultBackend.image.tag=latest,controller.image.tag=0.27.1
@@ -25,17 +24,23 @@ sudo iptables -P FORWARD ACCEPT
 sudo ip link del docker0
 sudo ip link del flannel.1
 sudo systemctl start docker
+# Remember power switch -> 
+# North -> port 4 -> switch 3
+# South -> port 2 -> switch 4
+# West  -> port 3 -> USB
+# East  -> port 5 -> USB
 ```
 
-#### 3- Install NFS Storage (With testing)
+##### 3- Install NFS Storage (With testing)
 ```
-kubectl apply -f storage/nfs-deployment.yml
-kubectl apply -f storage/nfs-testing.yml
+kubectl apply -f ../storage/nfs-deployment.yml
+kubectl apply -f ../storage/nfs-testing.yml
 ```
 
-#### 4- Save your Cluster :
+##### 4- Save your Cluster :
 ```
-./os/backup.sh # cluset data will be saved in ~/bkp
+# cluset data will be saved in ~/bkp
+./../os/backup.sh 
 ```
 
 #### 5- Cluster Tear down :

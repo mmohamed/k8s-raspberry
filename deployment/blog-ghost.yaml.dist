@@ -113,10 +113,15 @@ spec:
         - mountPath: /var/lib/ghost/config.production.json
           subPath: config.production.json
           name: prod-conf  
+        - mountPath: /var/lib/ghost/content
+          name: content-persistent-storage
       volumes:
         - name: prod-conf
           configMap:
             name: ghost-config
+        - name: content-persistent-storage
+          persistentVolumeClaim:
+            claimName: blog-pv-claim
 
 ---
 apiVersion: v1

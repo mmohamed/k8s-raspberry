@@ -4,3 +4,10 @@
     line: "{{ hostvars[item].ansible_host }} {{ item }}"
     regexp: '.*{{ item }}$'
   with_items: "{{ groups.all }}"
+
+- name: Update hosts template file
+  lineinfile:
+    dest: /etc/cloud/templates/hosts.debian.tmpl
+    line: "{{ hostvars[item].ansible_host }} {{ item }}"
+    regexp: '.*{{ item }}$'
+  with_items: "{{ groups.all }}"
