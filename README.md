@@ -2,7 +2,7 @@
 
 How to deploy a Kubernetes K8S solution on your own cluster composed by some raspberry
 
-![Cover](cover.jpg =900x900)
+<img src="https://github.com/mmohamed/k8s-raspberry/blob/master/cover.jpg" width="900" height="900">
 
 ----
 
