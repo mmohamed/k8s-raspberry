@@ -1,7 +1,7 @@
-FROM openjdk:11-jre-slim
+FROM arm32v7/openjdk:11-jre-slim
 
 RUN apt-get update \
-    && apt-get install -y curl gnupg2 unzip \
+    && apt-get install -y curl gnupg2 unzip libjna-java \
     && rm -rf /var/lib/apt/lists/*
 
 ENV SONAR_VERSION=7.9.2 \

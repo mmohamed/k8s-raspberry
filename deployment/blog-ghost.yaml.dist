@@ -113,7 +113,7 @@ spec:
         - mountPath: /var/lib/ghost/config.production.json
           subPath: config.production.json
           name: prod-conf  
-        - mountPath: /var/lib/ghost/content
+        - mountPath: /var/lib/ghost/current/content
           name: content-persistent-storage
       volumes:
         - name: prod-conf
