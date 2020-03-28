@@ -72,7 +72,7 @@ RUN set -ex; \
 	gpg --batch --verify roundcubemail.tar.gz.asc roundcubemail.tar.gz; \
 	tar -xf roundcubemail.tar.gz -C /usr/src/; \
 	gpgconf --kill all; \
-	rm -r "$GNUPGHOME" roundcubemail.tar.gz.asc roundcubemail.tar.gz; \
+	rm -rf "$GNUPGHOME" roundcubemail.tar.gz.asc roundcubemail.tar.gz; \
 	# upstream tarballs include ./roundcubemail-${ROUNDCUBEMAIL_VERSION}/ so this gives us /usr/src/roundcubemail-${ROUNDCUBEMAIL_VERSION}
 	mv /usr/src/roundcubemail-${ROUNDCUBEMAIL_VERSION} /usr/src/roundcubemail; \
 	rm -rf /usr/src/roundcubemail/installer

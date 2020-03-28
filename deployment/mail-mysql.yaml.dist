@@ -13,8 +13,8 @@ metadata:
 type: Opaque
 data:
   rootpassword: cm9vdA==
-  username: cm91bmRjdWJlCg==
-  password: cm91bmRjdWJlCg==
+  username: cm91bmRjdWJl
+  password: cm91bmRjdWJl
 
 ---
 apiVersion: v1
