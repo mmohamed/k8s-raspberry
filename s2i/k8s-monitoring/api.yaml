@@ -10,11 +10,20 @@ kind: Secret
 metadata:
   name: monitoring-tls
   namespace: monitoring
-type: Opaque  
 data:
   tls.crt: {{crt}}
   tls.key: {{key}}
 type: kubernetes.io/tls
+
+---   
+apiVersion: v1
+kind: Secret
+metadata:
+  name: monitoring-token
+  namespace: monitoring
+type: Opaque  
+data:
+  security.token: {{encodedtoken}}
 
 ---
 apiVersion: extensions/v1beta1
@@ -59,16 +68,22 @@ spec:
         app: api
         commit: '{{commit}}'
     spec:
-      serviceAccountName: api-access 
+      serviceAccountName: api-access
       containers:
         - name: api
           image: medinvention/k8s-monitoring-api:arm
           imagePullPolicy: Always
+          env:
+            - name: COLLECTOR_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: monitoring-token
+                  key: security.token
           ports:
             - containerPort: 8080
           readinessProbe:
             httpGet:
-              path: /health
+              path: /k8s/actuator/health
               port: 8080
             initialDelaySeconds: 60
             timeoutSeconds: 2
@@ -76,7 +91,7 @@ spec:
             failureThreshold: 1
           livenessProbe:
             httpGet:
-              path: /health
+              path: /k8s/actuator/health
               port: 8080
             initialDelaySeconds: 300
             timeoutSeconds: 5
@@ -118,3 +133,46 @@ subjects:
   - kind: ServiceAccount
     name: api-access
     namespace: monitoring
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: monitoring-agent
+  namespace: monitoring
+  labels:
+    k8s-app: monitoring-agent
+spec:
+  selector:
+    matchLabels:
+      name: monitoring-agent
+  template:
+    metadata:
+      labels:
+        name: monitoring-agent
+        commit: '{{commit}}'
+    spec:
+      tolerations:
+      # this toleration is to have the daemonset runnable on master nodes
+      # remove it if your masters can't run pods
+      #- key: node-role.kubernetes.io/master
+      #  effect: NoSchedule
+      containers:
+      - name: monitoring-agent
+        image: busybox
+        env:
+          - name: NODE
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: SERVER
+            value: http://monitoring-service.monitoring.svc.cluster.local/k8s/collect/{{token}}/temperature
+        command: [ "sh", "-c"]
+        args:
+        - while true; do
+            TEMP=$(cat /sys/class/thermal/thermal_zone0/temp);
+            URL="$SERVER?node=$NODE&value=$TEMP";
+            wget -qO- $URL;
+            sleep 5;
+          done;
+        imagePullPolicy: IfNotPresent

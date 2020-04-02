@@ -1,6 +1,6 @@
 pipeline {
    agent {
-       label  'south'
+       label  'east'
    }
 
    tools {
@@ -107,7 +107,7 @@ server {
                   string(credentialsId: 'TLSCrt', variable: 'CRT')
                ]) {
                sh "export TOKEN=$TOKEN && export CRT=$CRT && export KEY=$KEY"
-               sh "cd k8s && sh deploy.sh"
+               sh "cd k8s && COLLECTORTOKEN=[YOURSECURITYTOKEN] sh deploy.sh"
             }  
          }
       }

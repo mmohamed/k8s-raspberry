@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 if [ -z "$CRT" ] || [ -z "$KEY" ]; then
@@ -8,6 +7,11 @@ fi
 
 if [ -z "$TOKEN" ]; then
 	echo "Kube Token environment value not found !"
+	exit 1
+fi
+
+if [ -z "$COLLECTORTOKEN" ]; then
+	echo "Collector Token environment value not found !"
 	exit 1
 fi
 
@@ -24,27 +28,19 @@ fi
 
 echo "Deploy for CommitID : ${commitID}"
 
-apidep=$(./kubectl --token=$TOKEN get deployment api -n monitoring)
-if [ $? != 0 ]; then
-	# create new deploy
-	sed -i "s|{{crt}}|`echo $CRT`|g" api.yaml
-	sed -i "s|{{key}}|`echo $KEY`|g" api.yaml
-	sed -i "s|{{host}}|api-monitoring.medinvention.dev|g" api.yaml
-	sed -i "s|{{commit}}|`echo $commitID`|g" api.yaml
+# create new deploy
+sed -i "s|{{crt}}|`echo $CRT`|g" api.yaml
+sed -i "s|{{key}}|`echo $KEY`|g" api.yaml
+sed -i "s|{{token}}|`echo $COLLECTORTOKEN`|g" api.yaml
+sed -i "s|{{encodedtoken}}|`echo -ne $COLLECTORTOKEN | base64`|g" api.yaml
+sed -i "s|{{host}}|api-monitoring.medinvention.dev|g" api.yaml
+sed -i "s|{{commit}}|`echo $commitID`|g" api.yaml
 
-	./kubectl --token=$TOKEN apply -f api.yaml
-	if [ $? != 0 ]; then
-		echo "Unable to deploy API !"
-		exit 1
-	fi	
-else
-	# patch it
-	./kubectl --token=$TOKEN patch deployment api -n monitoring -p '{"spec":{"template":{"metadata":{"labels":{"commit":"'$commitID'"}}}}}'
-	if [ $? != 0 ]; then
-		echo "Unable to patch API deployment !"
-		exit 1
-	fi	
-fi
+./kubectl --token=$TOKEN apply -f api.yaml
+if [ $? != 0 ]; then
+	echo "Unable to deploy API !"
+	exit 1
+fi	
 
 # wait for ready
 attempts=0
@@ -55,27 +51,17 @@ until $rolloutStatusCmd || [ $attempts -eq 60 ]; do
   sleep 10
 done
 
-appdep=$(./kubectl --token=$TOKEN get deployment front -n monitoring)
-if [ $? != 0 ]; then
-	# create new deploy
-	sed -i "s|{{crt}}|`echo $CRT`|g" front.yaml
-	sed -i "s|{{key}}|`echo $KEY`|g" front.yaml
-	sed -i "s|{{host}}|monitoring.medinvention.dev|g" front.yaml
-	sed -i "s|{{commit}}|`echo $commitID`|g" front.yaml
+# create new deploy
+sed -i "s|{{crt}}|`echo $CRT`|g" front.yaml
+sed -i "s|{{key}}|`echo $KEY`|g" front.yaml
+sed -i "s|{{host}}|monitoring.medinvention.dev|g" front.yaml
+sed -i "s|{{commit}}|`echo $commitID`|g" front.yaml
 
-	./kubectl --token=$TOKEN apply -f front.yaml
-	if [ $? != 0 ]; then
-		echo "Unable to deploy Front !"
-		exit 1
-	fi	
-else
-	# patch it
-	./kubectl --token=$TOKEN patch deployment front -n monitoring -p '{"spec":{"template":{"metadata":{"labels":{"commit":"'$commitID'"}}}}}'
-	if [ $? != 0 ]; then
-		echo "Unable to patch Front deployment !"
-		exit 1
-	fi	
-fi
+./kubectl --token=$TOKEN apply -f front.yaml
+if [ $? != 0 ]; then
+	echo "Unable to deploy Front !"
+	exit 1
+fi	
 
 # wait for ready
 attempts=0

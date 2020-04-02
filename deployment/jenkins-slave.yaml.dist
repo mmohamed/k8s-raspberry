@@ -35,7 +35,7 @@ spec:
         app: jenkins-slave
     spec:
       containers:
-      - name: jenkins-master
+      - name: jenkins-slave
         image: medinvention/jenkins-slave:arm
         imagePullPolicy: Always
         resources:
