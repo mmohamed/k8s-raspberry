@@ -1,0 +1,49 @@
+# apt-get install rpi.gpio
+# nohup sudo python server.py > /tmp/fan-server.log &
+
+from flask import Flask, jsonify
+import RPi.GPIO as GPIO
+import os, signal
+
+GPIO.setmode(GPIO.BOARD)
+ 
+IN1 = 11    # Input Pin 6
+IN2 = 13    # Input Pin 7
+ENABLE = 15 # Enable Pin 8
+ 
+GPIO.setup(IN1,GPIO.OUT)
+GPIO.setup(IN2,GPIO.OUT)
+GPIO.setup(ENABLE,GPIO.OUT)
+
+api = Flask(__name__)
+api.config['SERVER_NAME'] = '[NODE-FAN-IP]:5000'
+
+@api.route('/fan/status', methods=['GET'])
+def status():
+    status = GPIO.input(ENABLE) == GPIO.HIGH
+    return jsonify({"status": status, "message": ("FAN ON" if status else "FAN OFF")})
+
+@api.route('/fan/start', methods=['GET'])
+def start():
+    GPIO.output(IN1,GPIO.HIGH)
+    GPIO.output(IN2,GPIO.LOW)
+    GPIO.output(ENABLE,GPIO.HIGH)
+    return jsonify({"status": True, "message": "FAN started"})
+
+@api.route('/fan/stop', methods=['GET'])
+def stop():
+    GPIO.output(IN1,GPIO.HIGH)
+    GPIO.output(IN2,GPIO.LOW)
+    GPIO.output(ENABLE,GPIO.LOW)
+    return jsonify({"status": True, "message": "FAN stopped"})
+
+@api.route('/server/shutdown', methods=['GET'])
+def shutdown():
+    stop()
+    os.kill(os.getpid(), signal.SIGINT)
+    # not sended
+    return jsonify({"status": true, "message": "Server is shutting down..." })
+
+if __name__ == '__main__':
+    api.run()
+    GPIO.cleanup()

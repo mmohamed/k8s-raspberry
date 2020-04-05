@@ -9,5 +9,6 @@ docker/Dockerfile.*
 job/*-dyndns.yaml
 default-backend/*.yaml
 s2i/**/*.groovy
+s2i/**/*.py
 s2i/sf-demo/public/*
 !s2i/sf-demo/public/.gitkeep

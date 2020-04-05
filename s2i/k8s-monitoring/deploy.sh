@@ -28,11 +28,12 @@ fi
 
 echo "Deploy for CommitID : ${commitID}"
 
+ENCODEDCOLLECTORTOKEN=$(echo -n $COLLECTORTOKEN | base64)
 # create new deploy
 sed -i "s|{{crt}}|`echo $CRT`|g" api.yaml
 sed -i "s|{{key}}|`echo $KEY`|g" api.yaml
 sed -i "s|{{token}}|`echo $COLLECTORTOKEN`|g" api.yaml
-sed -i "s|{{encodedtoken}}|`echo -ne $COLLECTORTOKEN | base64`|g" api.yaml
+sed -i "s|{{encodedtoken}}|`echo $ENCODEDCOLLECTORTOKEN`|g" api.yaml
 sed -i "s|{{host}}|api-monitoring.medinvention.dev|g" api.yaml
 sed -i "s|{{commit}}|`echo $commitID`|g" api.yaml
 

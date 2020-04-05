@@ -79,6 +79,10 @@ spec:
                 secretKeyRef:
                   name: monitoring-token
                   key: security.token
+            - name: FAN_SERVER_URL
+              value: 'http://192.168.1.85:5000'
+            - name: FAN_MAXTEMP
+              value: '70'
           ports:
             - containerPort: 8080
           readinessProbe:
