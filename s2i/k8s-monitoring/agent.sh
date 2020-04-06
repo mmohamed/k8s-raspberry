@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# nohup sh agent.sh [YOUR-SECURITY-TOKEN] > /tmp/agent.log
 if [ -z "$1" ]; then
 	echo "Security Token required !"
 	exit 1
