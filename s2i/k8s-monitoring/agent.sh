@@ -1,6 +1,11 @@
 #!/bin/bash
-# nohup sh agent.sh [YOUR-SECURITY-TOKEN] > /tmp/agent.log
+# nohup sh agent.sh [NODE-NAME] [YOUR-SECURITY-TOKEN] > /tmp/agent.log
 if [ -z "$1" ]; then
+	echo "Node name required !"
+	exit 1
+fi
+
+if [ -z "$2" ]; then
 	echo "Security Token required !"
 	exit 1
 fi
@@ -17,7 +22,7 @@ while true; do
 		exit 1
 	fi
 
-	url="$server?node=master&value=$temperature"
+	url="$server?node=$2&value=$temperature"
 	
 	responseCode=$(curl --silent --output /dev/null --write-out "%{http_code}" $url)
 	
