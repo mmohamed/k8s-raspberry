@@ -82,7 +82,7 @@ spec:
             - name: FAN_SERVER_URL
               value: 'http://192.168.1.85:5000'
             - name: FAN_MAXTEMP
-              value: '70'
+              value: '60'
           ports:
             - containerPort: 8080
           readinessProbe:

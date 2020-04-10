@@ -1,0 +1,106 @@
+# sudo pt-get install rpi.gpio libjpeg62 libopenjp2-7 libtiff5 libxcb1 python-smbus
+# sudo pip install Pillow
+# git clone https://github.com/adafruit/Adafruit_Python_SSD1306.git && cd Adafruit_Python_SSD1306
+# sudo python setup.py install
+# nohup sudo python server.py > /tmp/fan-server.log &
+# @see https://www.rhydolabz.com/wiki/?p=11288 
+# @see https://www.instructables.com/id/DC-Motor-Control-With-Raspberry-Pi-and-L293D/
+# @see https://pinout.xyz/
+
+from flask import Flask, jsonify, request
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
+from queue import Queue
+
+import threading
+import time
+import RPi.GPIO as GPIO
+import os, signal
+import Adafruit_GPIO.SPI as SPI
+import Adafruit_SSD1306
+ 
+IN1 = 17    # Input Pin 11
+IN2 = 27    # Input Pin 13
+ENABLE = 22 # Enable Pin 15
+ 
+RST = 24    # RST for I2C
+
+disp = Adafruit_SSD1306.SSD1306_128_64(rst=RST)
+
+GPIO.setup(IN1,GPIO.OUT)
+GPIO.setup(IN2,GPIO.OUT)
+GPIO.setup(ENABLE,GPIO.OUT)
+
+disp.begin()
+disp.clear()
+disp.display()
+
+width = disp.width
+height = disp.height
+image = Image.new('1', (width, height))
+draw = ImageDraw.Draw(image)
+draw.rectangle((0,0,width,height), outline=0, fill=0)
+font = ImageFont.load_default()
+stateQueue = Queue()
+
+api = Flask(__name__)
+api.config['SERVER_NAME'] = '[NODE-IP]:5000'
+
+@api.route('/fan/status', methods=['POST'])
+def status():
+    stateQueue.put(request.get_json())
+    status = GPIO.input(ENABLE) == GPIO.HIGH
+    return jsonify({"status": status, "message": ("FAN ON" if status else "FAN OFF")})
+
+@api.route('/fan/start', methods=['GET'])
+def start():
+    GPIO.output(IN1,GPIO.HIGH)
+    GPIO.output(IN2,GPIO.LOW)
+    GPIO.output(ENABLE,GPIO.HIGH)
+    return jsonify({"status": True, "message": "FAN started"})
+
+@api.route('/fan/stop', methods=['GET'])
+def stop():
+    GPIO.output(IN1,GPIO.HIGH)
+    GPIO.output(IN2,GPIO.LOW)
+    GPIO.output(ENABLE,GPIO.LOW)
+    return jsonify({"status": True, "message": "FAN stopped"})
+
+@api.route('/server/shutdown', methods=['GET'])
+def shutdown():
+    stop()
+    os.kill(os.getpid(), signal.SIGINT)
+    # not sended
+    return jsonify({"status": true, "message": "Server is shutting down..." })
+
+def printState(q, draw, width, height, font, image, disp):
+    while True:
+        state = q.get()
+
+        y = -2
+        draw.rectangle((0,0,width,height), outline=0, fill=0)
+        for node in state.get('temperatures'):
+            draw.text((0, y), node.ljust(11, ' ')  + " : " + str(round(state.get('temperatures').get(node),2)) + " C°",  font=font, fill=255)
+            y += 8
+        # last line
+        draw.text((0, y),"Auto    : " + (" ON" if state.get('autoMode') else "OFF"),  font=font, fill=255)
+        draw.text((0, y+8),"Min/Max : " + str(int(state.get('minTemperature'))) + " C°/" + str(int(state.get('maxTemperature'))) +" C°",  font=font, fill=255)
+        disp.image(image)
+        disp.display()
+
+        time.sleep(.1)
+        q.task_done()
+
+if __name__ == '__main__':
+    worker = threading.Thread(
+        target=printState,
+        args=(stateQueue,draw, width, height, font, image, disp)
+    )
+    worker.setDaemon(True)
+    worker.start()
+    stateQueue.join()
+    api.run()
+    GPIO.cleanup()
+    disp.clear()
+    disp.display()
