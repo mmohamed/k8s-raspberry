@@ -4,6 +4,8 @@ os/*.yml
 os/*dns.sh
 deployment/tls/*
 !deployment/tls/.gitkeep
+!deployment/tls/*.sh
+!deployment/tls/*.md
 deployment/*.yaml
 docker/Dockerfile.*
 job/*-dyndns.yaml

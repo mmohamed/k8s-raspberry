@@ -23,7 +23,7 @@ flash --hostname [HOSTNAME] hypriotos-rpi-v1.12.0.img
 
 ##### [4-Set up cluster](kube/README.md)
 
-##### [5-Get SSL for your domains  from letsencrypt](https://letsencrypt.org)
+##### [5-Get SSL for your domains from letsencrypt](deployment/tls/README.md)
 
 ##### [6-Cluster Dashboard](https://blog.hypriot.com/post/setup-kubernetes-raspberry-pi-cluster/)
 ```
