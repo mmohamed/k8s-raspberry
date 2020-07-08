@@ -1,5 +1,7 @@
-# sudo pt-get install rpi.gpio libjpeg62 libopenjp2-7 libtiff5 libxcb1 python-smbus
-# sudo pip install Pillow
+# sudo apt-get install rpi.gpio libjpeg62 libopenjp2-7 libxcb1 python-smbus
+# sudo apt-get install build-essential python3-dev libtiff5 python3-setuptools
+# sudo pip3 install Pillow
+# sudo pip3 install flask
 # git clone https://github.com/adafruit/Adafruit_Python_SSD1306.git && cd Adafruit_Python_SSD1306
 # sudo python setup.py install
 # nohup sudo python server.py > /tmp/fan-server.log &
