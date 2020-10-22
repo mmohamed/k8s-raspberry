@@ -9,13 +9,24 @@ sudo apt-get install certbot
 ##### 1- Make SSL :
 * You can use manual mode to get SSL, run : 
 ```
-sudo certbot certonly --manual --preferred-challenges dns
+# for no-interactive mode
+sudo certbot certonly --manual --preferred-challenges=dns --email io@medinvention.dev  --agree-tos --manual-public-ip-logging-ok -d *.medinvention.dev
+
+# or interactive mode
+# sudo certbot certonly --manual --preferred-challenges dns
+
 # > say Y
 # > give your domain *.medinvention.dev (it's wildcard for all subdomains and not root domain)
 # > Copy TXT record & Create TXT record named "_acme-challenge" with security token as value in your domain provider dashboard
 
 # > Wait some minutes and Check TXT record 
-dig -t txt *.medinvention.dev
+dig -t txt _acme-challenge.medinvention.dev
+
+# if don't see your TXT record, you can run a dns ache update https://developers.google.com/speed/public-dns/cache and check his status & propagation.
+# - https://www.whatsmydns.net/#TXT/_acme-challenge.medinvention.dev
+# - https://dns.google.com/query?name=medinvention.dev&rr_type=TXT&ecs=
+# - https://dnsmap.io/#TXT/_acme-challenge.medinvention.dev
+# - https://dnslookup.online/txt.html
 
 # > Copy fullchain & private key to tls directory
 sudo cp /etc/letsencrypt/live/medinvention.dev-0001/fullchain.pem crt-new.raw
