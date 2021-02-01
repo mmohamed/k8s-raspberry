@@ -1,5 +1,6 @@
 ansible/hosts
 ansible/group_vars/*.yml
+ansible/bootstrap.sh
 os/*.yml
 os/*dns.sh
 deployment/tls/*
