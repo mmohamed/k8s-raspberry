@@ -1,8 +1,8 @@
-# Kubernetes On Raspberry
+# Kubernetes On Raspberry [ARMhf](README.md)/[ARM64](ARM64.md)
 
 How to deploy a Kubernetes K8S solution on your own cluster composed by some raspberry
 
-<img src="https://github.com/mmohamed/k8s-raspberry/blob/master/cover.jpg" width="900" height="900">
+<img src="https://raw.githubusercontent.com/mmohamed/k8s-raspberry/master/cover.jpg" width="900" height="900">
 
 ----
 
