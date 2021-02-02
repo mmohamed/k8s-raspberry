@@ -1,10 +1,17 @@
 # sudo apt-get install rpi.gpio libjpeg62 libopenjp2-7 libxcb1 python-smbus
 # sudo apt-get install build-essential python3-dev libtiff5 python3-setuptools
-# sudo pip3 install Pillow
-# sudo pip3 install flask
+
+# Without pipenv : 
+# sudo pip3 install Pillow flask
 # git clone https://github.com/adafruit/Adafruit_Python_SSD1306.git && cd Adafruit_Python_SSD1306
 # sudo python setup.py install
 # nohup sudo python server.py > /tmp/fan-server.log &
+
+# With pipenv
+# pipenv install Pillow RPi.GPIO flask 
+# pipenv install -e git+https://github.com/adafruit/Adafruit_Python_SSD1306.git#egg=Adafruit_GPIO
+# nohup pipenv run python server.py > /tmp/fan-server.log &
+
 # @see https://www.rhydolabz.com/wiki/?p=11288 
 # @see https://www.instructables.com/id/DC-Motor-Control-With-Raspberry-Pi-and-L293D/
 # @see https://pinout.xyz/
