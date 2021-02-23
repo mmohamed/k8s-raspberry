@@ -10,6 +10,7 @@ sudo echo -n 'cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1' >> /boo
 sudo hostnamectl set-hostname [NODE-HOSTNAME]
 sudo adduser [USER]
 sudo usermod -aG sudo [USER]
+sudo usermod -aG docker [USER]
 sudo userdel ubuntu
 sudo rm -r /home/ubuntu
 ```
