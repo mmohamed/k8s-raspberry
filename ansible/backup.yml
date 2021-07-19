@@ -1,0 +1,13 @@
+- hosts: 127.0.0.1   
+  connection: local
+  gather_facts: no
+
+  tasks:
+    #- debug: var=hostvars
+
+    - name: Create a backup of ssd card
+      shell: 'ssh {{ ansible_user_id }}@{{ item }} "sudo -S dd if=/dev/mmcblk0 bs=64k status=progress | gzip -1 -" | dd of={{ item }}-18072021.gz bs=64k'
+      async: 45
+      poll: 5
+      with_items:
+        - "{{ groups.all }}"
