@@ -78,8 +78,16 @@ sudo exportfs -a
 kubectl apply -f https://raw.githubusercontent.com/mmohamed/k8s-raspberry/master/storage/nfs-deployment.yaml
 kubectl apply -f https://raw.githubusercontent.com/mmohamed/k8s-raspberry/master/storage/nfs-testing.yaml
 ```
+
 ## Join
 ```
 master => kubeadm token create --print-join-command
 each nodes => kubeadm join --discovery-token abcdef.1234567890abcdef --discovery-token-ca-cert-hash sha256:1234..cdef 1.2.3.4:6443
 ```
+
+## Tips
+- Emulate RPI to run iso image : https://github.com/dhruvvyas90/qemu-rpi-kernel / https://gist.github.com/plembo/c4920016312f058209f5765cb9a3a25e
+- Activate USB Boot RPI : https://www.framboise314.fr/boot-simplifie-sur-usb-avec-les-raspberry-pi-1-2-et-3/
+- Fix SDCard boot error : https://raspberrypi.stackexchange.com/questions/40854/kernel-panic-not-syncing-vfs-unable-to-mount-root-fs-on-unknown-block179-6 / https://forums.raspberrypi.com/viewtopic.php?t=172259
+
+
