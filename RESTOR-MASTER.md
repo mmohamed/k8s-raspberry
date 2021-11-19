@@ -56,7 +56,6 @@ sudo cp ./linux-arm/helm /usr/bin/helm
 ```
 helm repo add stable https://charts.helm.sh/stable
 helm install nginx-ingress stable/nginx-ingress --set defaultBackend.image.repository=docker.io/medinvention/ingress-default-backend,controller.image.repository=quay.io/kubernetes-ingress-controller/nginx-ingress-controller-arm64,defaultBackend.image.tag=latest,controller.image.tag=0.27.1
-helm install ingress stable/nginx-ingress --set controller.hostNetwork=true,controller.kind=DaemonSet
 * Check public IP if set
 kubectl get svc ingress-nginx-ingress-controller -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
 * You can set it manual
