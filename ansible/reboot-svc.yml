@@ -1,0 +1,20 @@
+- hosts: all
+  become: yes
+
+  tasks:
+    - name: Stop service
+      command: systemctl stop docker
+    - name: Clean CNI 1/4
+      command: iptables -t nat -F
+    - name: Clean CNI 2/4
+      command: iptables -P FORWARD ACCEPT 
+    - name: Clean CNI 3/4
+      command: ip link del docker0
+      ignore_errors: true
+    - name: Clean CNI 4/4
+      command: ip link del flannel.1
+      ignore_errors: true
+    - name: Start service
+      command: systemctl start docker
+
+# ansible-playbook reboot-svc.yml -i hosts --verbose --limit "north,south,east"

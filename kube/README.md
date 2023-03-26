@@ -24,11 +24,11 @@ sudo iptables -P FORWARD ACCEPT
 sudo ip link del docker0
 sudo ip link del flannel.1
 sudo systemctl start docker
-# Remember power switch -> 
-# North -> port 4 -> switch 3
-# South -> port 2 -> switch 4
-# West  -> port 3 -> USB
-# East  -> port 5 -> USB
+# If docker service can't (caused by containered failure) : sudo rm /var/lib/containerd/io.containerd.metadata.v1.bolt/meta.db
+# see 
+# - https://github.com/containerd/containerd/issues/3347 
+# - https://askubuntu.com/questions/1222440/why-wont-the-docker-service-start
+
 ```
 
 ##### 3- Install NFS Storage (With testing)

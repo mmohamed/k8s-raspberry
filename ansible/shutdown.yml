@@ -1,0 +1,8 @@
+- hosts: all
+  become: yes
+
+  tasks:
+    - name: Shutdown
+      command: shutdown -P 0
+
+# ansible-playbook shutdown.yml -i hosts --verbose --limit "north,south,east"
