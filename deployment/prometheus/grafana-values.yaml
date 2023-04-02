@@ -1,0 +1,23 @@
+ingress:
+  enabled: true
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+  hosts:
+    - grafana.medinvention.dev
+  tls:
+    - secretName: grafana-tls
+      hosts:
+        - grafana.medinvention.dev
+
+adminPassword: grafanaadmin
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus-server.prometheus.svc.cluster.local
+      access: proxy
+      isDefault: true

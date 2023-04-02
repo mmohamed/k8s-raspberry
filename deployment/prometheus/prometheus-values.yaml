@@ -1,0 +1,12 @@
+server:
+  ingress:
+      enabled: true
+      annotations: 
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt-staging
+      hosts:
+        - prometheus.medinvention.dev
+      tls:
+        - secretName: prometheus-server-tls
+          hosts:
+            - prometheus.medinvention.dev.com
