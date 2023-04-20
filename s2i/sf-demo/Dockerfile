@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:kinetic
 
 EXPOSE 8080
 
