@@ -24,7 +24,9 @@ sudo iptables -P FORWARD ACCEPT
 sudo ip link del docker0
 sudo ip link del flannel.1
 sudo systemctl start docker
-# If docker service can't (caused by containered failure) : sudo rm /var/lib/containerd/io.containerd.metadata.v1.bolt/meta.db
+# If docker service can't (caused by containered failure) : 
+# sudo rm /var/lib/containerd/io.containerd.metadata.v1.bolt/meta.db
+# sudo rm -rf /var/lib/docker/containers
 # see 
 # - https://github.com/containerd/containerd/issues/3347 
 # - https://askubuntu.com/questions/1222440/why-wont-the-docker-service-start
