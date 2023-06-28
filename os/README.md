@@ -6,3 +6,7 @@ sed "s/{{USER}}/[DNSUSER]/" os/dyndns.sh.dist | sed "s/{{PASSWORD}}/[DNSPWD]/" |
 chomod +x os/dyndns-[HOST].sh
 ./os/dyndns-[HOST].sh
 ```
+
+
+
+

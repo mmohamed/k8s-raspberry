@@ -1,0 +1,8 @@
+pilot:
+  nodeSelector:
+    kubernetes.io/arch: arm64
+
+
+global:
+  istioNamespace: istio-system
+ 

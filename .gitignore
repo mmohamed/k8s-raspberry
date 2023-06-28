@@ -17,3 +17,4 @@ s2i/sf-demo/public/*
 !s2i/sf-demo/public/.gitkeep
 bkp/
 os/*.tar.gz
+BBOX.config.md

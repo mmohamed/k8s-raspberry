@@ -16,5 +16,7 @@
       ignore_errors: true
     - name: Start service
       command: systemctl start docker
+    - name: Restart kubelet service
+      command: systemctl restart kubelet
 
 # ansible-playbook reboot-svc.yml -i hosts --verbose --limit "north,south,east"

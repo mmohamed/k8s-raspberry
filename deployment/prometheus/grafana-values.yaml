@@ -21,3 +21,8 @@ datasources:
       url: http://prometheus-server.prometheus.svc.cluster.local
       access: proxy
       isDefault: true
+
+persistence:
+  enabled: true
+
+# helm upgrade --reuse-values -f grafana-values.yaml -n prometheus grafana grafana/grafana --version 6.52.4

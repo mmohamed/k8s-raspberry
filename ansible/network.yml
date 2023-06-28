@@ -1,0 +1,17 @@
+- hosts: all
+  become: yes
+
+  tasks:
+    - name: Shudwon Docker
+      command: systemctl stop docker
+
+    - name: Reset IPTABLE (for CNI)
+      shell: iptables -t nat -F && \
+               iptables -P FORWARD ACCEPT && \
+               ip link del docker0 && \
+               ip link del flannel.1
+
+    - name: Start Docker
+      command: systemctl start docker
+
+# example : ansible-playbook ansible/network.yml -i ansible/hosts --limit north,south
