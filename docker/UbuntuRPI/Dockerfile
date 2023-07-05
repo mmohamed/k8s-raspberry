@@ -1,4 +1,4 @@
-From ubuntu:latest
+From ubuntu:kinetic
 
 RUN apt-get update && apt-get install -y openssh-server sudo && rm -rf /var/lib/apt/lists/*
 
